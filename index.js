@@ -6,15 +6,29 @@ require('dotenv').config()
 app.use(cors())
 app.use(express.json())
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, FindCursor } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.im5wk.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  client.close();
-});
 
+async function run() {
+  try {
+    await client.connect();
+    const dilwaleCollection = client.db("userData").collection("Diwale");
+    const idiotsCollection = client.db("userData").collection("idiots");
+   app.get("/dilwale" , async(req , res) =>{
+    const result = await dilwaleCollection.find().toArray()
+    res.send(result)
+   })
+   app.get("/idiots" , async(req , res) =>{
+    const result = await idiotsCollection.find().toArray()
+    res.send(result)
+   })
+    
+  }finally {
+    
+  }
+}
+run().catch(console.dir);
 app.get('/', (req, res) => {
   res.send('Outshad digital software')
 })
